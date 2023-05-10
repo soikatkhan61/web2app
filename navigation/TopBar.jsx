@@ -46,7 +46,7 @@ const TopBar = ({ showMenu, setShowMenu, scaleValue, offsetValue }) => {
         >
             <TouchableOpacity
                 style={{
-                    backgroundColor: "red",
+                    backgroundColor: "white",
                     paddingHorizontal: 15,
                     paddingVertical: 15,
                 }}
@@ -62,7 +62,7 @@ const TopBar = ({ showMenu, setShowMenu, scaleValue, offsetValue }) => {
 
             <TouchableOpacity onPress={() => { /* Do something */ }}
                 style={{
-                    backgroundColor: "red",
+                    backgroundColor: "white",
                     paddingHorizontal: 15,
                     paddingVertical: 15,
                 }}

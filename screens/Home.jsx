@@ -1,4 +1,4 @@
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View, RefreshControl, ScrollView } from 'react-native';
 import {
     SafeAreaView,
 } from 'react-native-safe-area-context';
@@ -6,30 +6,61 @@ import { ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 import Drawer from '../navigation/Drawer';
 import TopBar from '../navigation/TopBar';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState,useEffect } from 'react';
 import Overlay from '../components/Overlay';
-import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import { BannerAd, BannerAdSize, TestIds,RewardedAd, RewardedAdEventType, } from 'react-native-google-mobile-ads';
 const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+
 
 const Home = () => {
     const [showMenu, setShowMenu] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const offsetValue = useRef(new Animated.Value(0)).current;
     const scaleValue = useRef(new Animated.Value(1)).current;
-    const [currentUrl, setCurrentUrl] = useState('https://www.google.com');
+    const [currentUrl, setCurrentUrl] = useState('https://xtensoft.com/');
+    const webviewRef = useRef();
+    const [refreshing, setRefreshing] = React.useState(false);
+    
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        webviewRef.current.reload();
+        
+    }, []);
+
+    const handleWebViewLoad = () => {
+        setIsLoading(false);
+        setRefreshing(false);
+      };
 
     const handleUrlChange = (url) => {
         setIsLoading(true);
         setCurrentUrl(url);
     };
+
     const handleWebViewNavigationStateChange = (navState) => {
         if (navState.url !== currentUrl) {
             setIsLoading(true);
             setCurrentUrl(navState.url);
         }
     };
+    const [refresherEnabled, setEnableRefresher] = useState(true);
+
+    const handleScroll = (event) => {
+    const yOffset = Number(event.nativeEvent.contentOffset.y)
+    if (yOffset === 0){
+      setEnableRefresher(true)
+    }else{
+      setEnableRefresher(false)
+    }
+      };
+   
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.container}
+        refreshControl={
+            <RefreshControl refreshing={refreshing} enabled={refresherEnabled} onRefresh={onRefresh} />
+          }
+        >
             {isLoading ? (
                 <View style={styles.loadingOverlay}>
                     <ActivityIndicator size="large" color="white" />
@@ -57,7 +88,9 @@ const Home = () => {
                     source={{ uri: currentUrl }}
                     style={{ flex: 1, zIndex: 2 }}
                     onNavigationStateChange={handleWebViewNavigationStateChange}
-                    onLoad={() => setIsLoading(false)}
+                    onLoad={() => handleWebViewLoad()}
+                    ref={webviewRef}
+                    onScroll={handleScroll}
                 />
             </Animated.View>
             <BannerAd
@@ -68,7 +101,8 @@ const Home = () => {
                     requestNonPersonalizedAdsOnly: true,
                 }}
             />
-        </SafeAreaView>
+        </ScrollView>
+        </View>
     )
 }
 
@@ -95,10 +129,10 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
-    bottomBanner:{
-        position:"absolute",
-        bottom:0,
-        zIndex:1
+    bottomBanner: {
+        position: "absolute",
+        bottom: 0,
+        zIndex: 1
     }
 });
 

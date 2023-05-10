@@ -53,10 +53,10 @@ const Drawer = ({onUrlChange}) => {
                 <TabButton
                     currentTab={currentTab}
                     setCurrentTab={setCurrentTab}
-                    title="Facebook"
+                    title="Webview Apps"
                     image={home}
                     onUrlChange={onUrlChange}
-                    url={'www.facebook.com'}
+                    url={'https://xtensoft.com/webview-apps'}
                 />
                 <TabButton
                     currentTab={currentTab}
